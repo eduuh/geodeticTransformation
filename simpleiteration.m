@@ -1,4 +1,4 @@
-function [latitude, longitude, altitude] = ecef2geod(x, y, z, tol)
+function [latitude, longitude, height] = simpleiteration(x, y, z, tol)
 
 % ECEF2GEOD Convert ECEF coordinates to geodetic coordinates.
 % 
@@ -26,7 +26,7 @@ function [latitude, longitude, altitude] = ecef2geod(x, y, z, tol)
 % Ouputs:
 %   -LATITUDE: Geodetic latitude in degrees.
 %   -LONGITUDE: Geodetic longitude in degrees.
-%   -ALTITUDE: Height above the Earth in meters.
+%   -height: Height above the Earth in meters.
 %   -LLA: When just one output is requested, the three outputs above are
 %   returned as a row vector for scalar inputs, an M-by-3 matrix for column
 %   vector inputs, a 3-by-M matrix for row vector inputs, or the three
@@ -65,23 +65,27 @@ a = 6378137; f = 1/298.257223563; b = a*(1 - f); e2 = 1 - (b/a)^2;
 longitude = atan2(y, x)*180/pi;
 
 % Compute latitude recursively.
+% compute for P
+
 rd = hypot(x, y);
+
 [latitude, Nphi] = recur(asin(z ./ hypot(x, hypot(y, z))), z, a, e2, ...
     rd, tol, 1);
+    
 sinlat = sin(latitude); coslat = cos(latitude); latitude = latitude*180/pi;
 
-% Get altitude from latitude.
-altitude = rd.*coslat + (z + e2*Nphi.*sinlat).*sinlat - Nphi;
+% Get height from latitude.
+height = rd.*coslat + (z + e2*Nphi.*sinlat).*sinlat - Nphi;
 
 % Shape output according to number of arguments.
 if nargout <= 1
     if nargin <= 2
-        latitude = cat(first3, latitude, longitude, altitude);
+        latitude = cat(first3, latitude, longitude, height);
     else
         dims = ndims(latitude);
         if dims == 2
             if size(latitude, 2) == 1
-                latitude = [latitude, longitude, altitude];
+                latitude = [latitude, longitude, height];
             else
                 latitude = [latitude; longitude; latitude];
             end
@@ -92,10 +96,10 @@ if nargout <= 1
 end
 
 function [latitude, Nphi] = recur(lat_in, z, a, e2, rd, tol, iter)
-thisNphi = a ./ sqrt(1 - e2*sin(lat_in).^2);
-nextlat = atan((z + thisNphi*e2.*sin(lat_in))./rd);
+v = a ./ sqrt(1 - e2*sin(lat_in).^2);
+nextlat = atan((z + v*e2.*sin(lat_in))./rd);
 if all(abs(lat_in - nextlat) < tol) || iter > 100
-    latitude = nextlat; Nphi = thisNphi;
+    latitude = nextlat; Nphi = v;
 else
     [latitude, Nphi] = recur(nextlat, z, a, e2, rd, tol, iter + 1);
 end
