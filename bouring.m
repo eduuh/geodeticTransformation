@@ -107,3 +107,4 @@ if all(abs(lat_in - nextlat) < tol) || iter > 100
 else
     [latitude, Nphi] = recur(nextlat, z, a, e2, rd, tol, iter + 1);
 end
+ 
