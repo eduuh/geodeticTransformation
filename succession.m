@@ -68,8 +68,8 @@ longitude = atan2(y, x)*180/pi;
 % compute for P
 
 rd = hypot(x, y);
-thetaone = z / (rd*(1-f).^2);
-(thetaone)
+thetaone = atan(z / (rd*(1-f).^2));
+
 [latitude, Nphi] = recur(thetaone, z, a,b, e2, ...
     rd, tol, 1);
     
@@ -98,11 +98,15 @@ end
 
 function [latitude, Nphi] = recur(lat_in, z, a,b, e2, rd, tol, iter)
   
-se = e2 / (1-e2);
+
+ve = (a^2 - b^2)/b^2;
+
 v = a ./ sqrt(1 - e2*sin(lat_in).^2);
-nextlat = atan((z + v*e2.*sin(lat_in))./rd);
+
+nextlat = atan((z + (v*ve*sin(lat_in)))./rd);
+
 if all(abs(lat_in - nextlat) < tol) || iter > 100
     latitude = nextlat; Nphi = v;
 else
-    [latitude, Nphi] = recur(nextlat, z, a, e2, rd, tol, iter + 1);
+    [latitude, Nphi] = recur(nextlat, z, a,b, e2, rd, tol, iter + 1);
 end

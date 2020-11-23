@@ -59,21 +59,34 @@ end
 % WGS84 parameters.
 a = 6378137; f = 1/298.257223563; b = a*(1 - f); e2 = 1 - (b/a)^2;
 
-	
-
 % Longitude is easy:
 longitude = atan2(y, x)*180/pi;
-
 
 % Compute latitude recursively.
 % compute for P
 
 rd = hypot(x, y);
+	
 
-alpha = (rd + a^2*e2^2)/(1-e2);beta = (rd - a^2*e2^2)/(1-e2);
-q= 1+((27*z^2*(alpha^2-beta))/(2*(beta+z^2)^3)); u1 = sqrt((q+sqrt(q^2-1))^1/3+(q-sqrt(q^2-1))^1/3);
-t1 = ((beta+z^2)*u1/(6))+(z^2/12)-(beta/6);zeta = (t1^0.5)+((z^2/4)-(beta/2)-t1+((a*z)/(4*t1^0.5)))^0.5;
-latitude = atan((zeta + (z/2))/rd);v = a ./ sqrt(1 - e2*sin(latitude).^2);
+alpha = (rd + (a^2*e2^2))/(1-e2);
+beta = (rd - (a^2*e2^2))/(1-e2);
+
+q= 1+((27*z^2*(alpha^2-beta))/(2*(beta+z^2)^3)); 
+
+
+u1 = 0.5*((q+sqrt(q^2-1))^1/3+(q-sqrt(q^2-1))^1/3);
+
+t1 = ((beta+z^2)/(6))*u1+(z^2/12)-(beta/6);
+
+if(z < 0)
+    zeta = -sqrt(t1)+-sqrt((z^2/4)-(beta/2)-t1+((a*z)/(4*-sqrt(t1))));
+else
+    zeta = sqrt(t1)+sqrt((z^2/4)-(beta/2)-t1+((a*z)/(4*sqrt(t1))));
+endif
+
+latitude = atan((zeta + (z/2))/rd);
+
+v = a ./ sqrt(1 - e2*sin(latitude).^2);
 
 sinlat = sin(latitude); coslat = cos(latitude); latitude = latitude*180/pi;
 

@@ -1,4 +1,4 @@
-function [latitude, longitude, height] = linwanq(x, y, z, tol)
+function [latitude, longitude, height] = linwang(x, y, z, tol)
 
 % ECEF2GEOD Convert ECEF coordinates to geodetic coordinates.
 % 
