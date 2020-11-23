@@ -1,4 +1,4 @@
-function [latitude, longitude, height] = newton(x, y, z, tol)
+function [latitude, longitude, height] = simpleiteration(x, y, z, tol)
 
 % ECEF2GEOD Convert ECEF coordinates to geodetic coordinates.
 % 
@@ -69,7 +69,7 @@ longitude = atan2(y, x)*180/pi;
 
 rd = hypot(x, y);
 
-[latitude, Nphi] = recur(atan(z/(rd*(1-f)^2)), z, a,b, e2, ...
+[latitude, Nphi] = recur(asin(z ./ hypot(x, hypot(y, z))), z, a, e2, ...
     rd, tol, 1);
     
 sinlat = sin(latitude); coslat = cos(latitude); latitude = latitude*180/pi;
@@ -95,21 +95,10 @@ if nargout <= 1
     end
 end
 
-function [latitude, Nphi] = recur(lat_in, z, a,b,c, e2, rd, tol, iter)
-
-% second eccentricity
-se = (a^2-b^2)/b^2;
-
-v = sqrt(1 + se*cos(lat_in).^2);
-q = sqrt((a*rd)^2 + (b*z)^2);
-c = (a^2 - b^2)/q;
-
-y1 = z + v*e2*sin(lat_in) - rd*tan(lat_in);
-y2 = (c/v^3)*se*cos(lat_in) - (rd/(cos(lat_in).^2));
-
-nextlat = lat_in - (y1/y2);
-
-if all(abs(y1/y2) < tol) || iter > 100
+function [latitude, Nphi] = recur(lat_in, z, a, e2, rd, tol, iter)
+v = a ./ sqrt(1 - e2*sin(lat_in).^2);
+nextlat = atan((z + v*e2.*sin(lat_in))./rd);
+if all(abs(lat_in - nextlat) < tol) || iter > 100
     latitude = nextlat; Nphi = v;
 else
     [latitude, Nphi] = recur(nextlat, z, a, e2, rd, tol, iter + 1);
