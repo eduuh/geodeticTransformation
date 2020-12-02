@@ -22,19 +22,14 @@ function [OLSparameters, OLSD]=parametersols(F,W)
       second = aTrns  * L;
       x = firstinv * second;
       parameters(r,:)= x';
-         x
-        translation = x(1:3)
-        rotation = x(4:6)
-        scale = x(7)
+        translation = x(1:3);
+        rotation = x(4:6);
+        scale = x(7);
         SF = [1+scale, rotation(3),-rotation(2); -rotation(3), 1+scale, rotation(1);rotation(2), -rotation(1), 1+scale ];
-        clarkepoint = translation +( SF * pointF')
-        pointW
-
+        clarkepoint = translation +( SF * pointF');
        
       % pointW
     end
-
-    parameters
 
     % [row, column] = size(translationx)
 
@@ -67,9 +62,6 @@ function [OLSparameters, OLSD]=parametersols(F,W)
     sdscalefactor = std(scalefactor);
 
     OLSparameters = [ meantranslationx; meantranslationy; meantranslationz;meanrotationx ; meanrotationy; meanrotationz;  meanscalefactor;];
-    
-    OLSparameters
 
-    
     OLSD = [sdscalefactor; sdtranslationx ; sdtrotationy; sdrotationz; sdtranslationx; sdtranslationy; sdtranslationz];
 end
