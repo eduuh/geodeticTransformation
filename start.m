@@ -9,14 +9,15 @@ xyzM = dlmread('updatedclarke1880.csv',',')
 [row, column] =  size(xyzM);
 
 geodeticMforSimplIteration = zeros(row,column);
-geodeticMforpaul= zeros(row,column);
+geodeticMforpaul= zeros(row,column); % to check on this
 geodeticMfornewton = zeros(row,column);
+geodeticMforBorkowski= zeros(row,column);
+
 geodeticMforSuccession= zeros(row,column);
 
 % not working as expected
 geodeticMforlinwang = zeros(row,column);
 geodeticMforBouringInverse= zeros(row,column);
-geodeticMforBorkowski= zeros(row,column);
 
 % Simple iterate according to rows
 
@@ -66,3 +67,11 @@ end
 fprintf("The lat, lon, height values of Succession");
 geodeticMfornewton
 
+for r=1:row
+    point = xyzM(r,:);x = point(1); y = point(2);z = point(3);
+    P = borkowski(x, y, z);
+    % value of row will change on each iteration.
+   geodeticMforBorkowski(r,:) = P;
+end
+fprintf("The lat, lon, height values of Borkwoski");
+geodeticMforBorkowski

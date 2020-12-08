@@ -95,38 +95,22 @@ if nargout <= 1
     end
 end
 
-function [latitude, Nphi] = recur(lat_in, z, a,b,c, e2, rd, tol, iter)
+function [latitude, Nphi] = recur(lat_in, z, a,b,e2, rd, tol, iter)
 
-
-se = (a^2-b^2)/b^2;
-
-v = sqrt(1 + se*cos(lat_in).^2);
+omega = atan((b*z)/(a*rd));
 q = sqrt((a*rd)^2 + (b*z)^2);
 c = (a^2 - b^2)/q;
 
-y1 = z + v*e2*sin(lat_in) - rd*tan(lat_in);
-y2 = (c/v^3)*se*cos(lat_in) - (rd/(cos(lat_in).^2));
+fpl = (2*sin(lat_in - omega))- (c*sin(2*lat_in));
+fplderivetive = (2*(cos(lat_in - omega))) - (c*cos(2*lat_in));
 
-jembe = lat_in - (y1/y2);
+v = a ./ sqrt(1 - e2*sin(lat_in).^2);
+plNplus1 = lat_in - (fpl/fplderivetive);
 
-% second eccentricity
-se = (a^2-b^2)/b^2;
-
-v = sqrt(1 + se*cos(lat_in).^2);
-
-q = sqrt((a*rd)^2 + (b*z)^2);
-c = (a^2 - b^2)/q;
-
-lat = atan(b*z / a*rd);
-y1 = 2*sin(jembe - lat) - c*sin(2*jembe);
-y2 = 2*(cos(jembe - lat))- c*cos(2*jembe);
-
-
-nextlat = atan((a/b)*tan(jembe))
-
+nextlat = atan((a/b)* tan(plNplus1));
 
 if all(abs(nextlat-lat_in) < tol) || iter > 100
     latitude = nextlat; Nphi = v;
 else
-    [latitude, Nphi] = recur(nextlat, z, a, e2, rd, tol, iter + 1);
+    [latitude, Nphi] = recur(nextlat, z, a,b,e2, rd, tol, iter + 1);
 end

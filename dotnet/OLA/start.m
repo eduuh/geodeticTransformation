@@ -46,7 +46,7 @@ printf("WGS84 to clarke parameters and Standard deviation \n\n");
 shiftsinWGS84 = wgs84pointscomputedfwgs84params - WGS84t;
 
 wgsoriginaltestpoints = WGS84t
-(wgs84pointscomputedfwgs84params)
+(wgs84pointscomputedfwgs84params )
 shiftsinWGS84
 % clark to WGS84gs84
 
